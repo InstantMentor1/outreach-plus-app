@@ -8,7 +8,7 @@ type ChatMessage = { role: 'user' | 'assistant'; content: string };
 const MAX_MESSAGES = 24;
 const MAX_MESSAGE_LENGTH = 4_000;
 const MAX_CONVERSATION_LENGTH = 24_000;
-const MODEL = 'gemini-2.5-flash';
+const MODEL = 'gemini-3.6-flash';
 
 const SYSTEM_INSTRUCTION = `You are Outreach+, a unified AI Social and Marketing Manager for cafés, restaurants, hotels, resorts and cloud kitchens.
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: messages.map((message) => ({ role: message.role === 'assistant' ? 'model' : 'user', parts: [{ text: message.content.trim() }] })),
-      config: { systemInstruction: SYSTEM_INSTRUCTION, temperature: 0.6, maxOutputTokens: 900 },
+      config: { systemInstruction: SYSTEM_INSTRUCTION, maxOutputTokens: 900 },
     });
     const reply = response.text?.trim();
     if (!reply) return Response.json({ error: 'Outreach+ returned an empty response. Please retry your message.' }, { status: 502 });
