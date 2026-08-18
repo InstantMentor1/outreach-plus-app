@@ -1,0 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { adminRequest } from '@/lib/server/security';
+import { supabaseAdmin } from '@/lib/server/supabase';
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) { if (!await adminRequest(request)) return NextResponse.json({ error: 'Unauthorised.' }, { status: 401 }); const { id } = await context.params; try { const { error } = await supabaseAdmin().from('brand_profiles').update({ reviewed: true }).eq('client_id', id); if (error) throw error; await supabaseAdmin().from('clients').update({ status: 'ready' }).eq('id', id); return NextResponse.json({ message: 'Brand Brain approved. You can now create an invitation.' }); } catch { return NextResponse.json({ error: 'The Brand Brain could not be approved.' }, { status: 500 }); } }
