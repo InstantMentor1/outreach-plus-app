@@ -3,6 +3,7 @@
 .next-stale
 node_modules
 dev-server.log
+*.log
 *.tsbuildinfo
 .env
 .env.*

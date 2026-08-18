@@ -1,114 +1,71 @@
-type ChatMessage = {
-  role: 'user' | 'assistant';
-  content: string;
-};
+import { ApiError, GoogleGenAI } from '@google/genai';
 
-const SYSTEM_INSTRUCTION = `You are Outreach+, a unified AI Social and Marketing Manager for cafes, restaurants, hotels, resorts and cloud kitchens.
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-Your job is to help hospitality business owners develop campaign ideas, content calendars, promotional offers, captions, hashtags and practical marketing recommendations.
+type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
-For a new business, collect only the missing essentials: business name, business type, location, target audience, brand tone and current marketing goal. Ask no more than two related questions in one reply. Never ask again for information already present in the conversation.
+const MAX_MESSAGES = 24;
+const MAX_MESSAGE_LENGTH = 4_000;
+const MAX_CONVERSATION_LENGTH = 24_000;
+const MODEL = 'gemini-2.5-flash';
 
-Once enough context is available, move from questions to useful work. Provide concrete campaign recommendations and clearly label any assumptions that require confirmation.
+const SYSTEM_INSTRUCTION = `You are Outreach+, a unified AI Social and Marketing Manager for cafés, restaurants, hotels, resorts and cloud kitchens.
 
-Never invent menu items, prices, discounts, dates, locations or offer conditions. Never claim that a post, campaign or message has been generated as an image, published, scheduled or measured unless an enabled tool has completed that action. At present you can plan campaigns and write text, but you cannot publish, schedule, retrieve live metrics or generate image files.
+Help hospitality business owners develop campaign ideas, content calendars, promotional offers, captions, hashtags and practical marketing recommendations.
 
-Keep responses concise, friendly and practical for a small-business owner in India. Use Indian English and rupee formatting when relevant.`;
+For a new business, collect only the missing essentials: business name, business type, location, target audience, brand tone and current marketing goal. Ask no more than two related questions in one reply. Never request information already present in the conversation.
+
+Once sufficient context is available, move from questions to useful campaign work.
+
+Never invent menu items, prices, discounts, dates, locations or offer conditions. Never claim that content was published, scheduled, measured or generated as an image unless a corresponding tool successfully performed that action.
+
+Currently, you may provide strategy, campaign plans, captions, hashtags and written promotional content. You cannot yet publish, schedule, retrieve live metrics or generate poster image files.
+
+Keep responses concise, friendly and practical. Use Indian English and rupee formatting where relevant.`;
 
 function isChatMessage(value: unknown): value is ChatMessage {
   if (!value || typeof value !== 'object') return false;
   const message = value as Record<string, unknown>;
-  return (
-    (message.role === 'user' || message.role === 'assistant') &&
-    typeof message.content === 'string' &&
-    message.content.trim().length > 0 &&
-    message.content.length <= 8_000
-  );
+  return (message.role === 'user' || message.role === 'assistant') && typeof message.content === 'string' && message.content.trim().length > 0 && message.content.length <= MAX_MESSAGE_LENGTH;
+}
+
+function errorResponse(error: unknown) {
+  const status = error instanceof ApiError
+    ? error.status
+    : typeof error === 'object' && error && typeof (error as { status?: unknown }).status === 'number'
+      ? (error as { status: number }).status
+      : undefined;
+
+  if (status === 401 || status === 403 || status === 400) return Response.json({ error: 'The Gemini API key was rejected. Please check the Vercel environment variable.' }, { status: 502 });
+  if (status === 404) return Response.json({ error: 'The configured Gemini model is unavailable. Please try again later.' }, { status: 502 });
+  if (status === 429) return Response.json({ error: 'Outreach+ is receiving too many requests. Please wait a moment and retry.' }, { status: 429 });
+  return Response.json({ error: 'Outreach+ could not reach the AI service. Please try again.' }, { status: 502 });
 }
 
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    return Response.json(
-      { error: 'The AI service is not configured yet.' },
-      { status: 503 },
-    );
-  }
+  if (!apiKey) return Response.json({ error: 'Outreach+ chat is not configured yet. Please add GEMINI_API_KEY in Vercel.' }, { status: 503 });
 
   let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return Response.json({ error: 'Invalid request.' }, { status: 400 });
+  try { body = await request.json(); } catch { return Response.json({ error: 'Please send a valid chat request.' }, { status: 400 }); }
+
+  const messages = body && typeof body === 'object' && Array.isArray((body as { messages?: unknown }).messages) ? (body as { messages: unknown[] }).messages : null;
+  if (!messages || messages.length === 0 || messages.length > MAX_MESSAGES || !messages.every(isChatMessage) || messages.reduce((total, message) => total + message.content.length, 0) > MAX_CONVERSATION_LENGTH) {
+    return Response.json({ error: 'Please keep your conversation concise and try again.' }, { status: 400 });
   }
 
-  const messages =
-    body && typeof body === 'object' && Array.isArray((body as { messages?: unknown }).messages)
-      ? (body as { messages: unknown[] }).messages
-      : null;
-
-  if (!messages || messages.length === 0 || messages.length > 30 || !messages.every(isChatMessage)) {
-    return Response.json({ error: 'Please send a valid conversation.' }, { status: 400 });
-  }
-
-  const contents = messages.map((message) => ({
-    role: message.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: message.content }],
-  }));
-
+  const ai = new GoogleGenAI({ apiKey });
   try {
-    const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-        },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-          contents,
-          generationConfig: {
-            temperature: 0.6,
-            maxOutputTokens: 900,
-          },
-        }),
-      },
-    );
-
-    const data = (await response.json()) as {
-      error?: { message?: string };
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-
-    if (!response.ok) {
-      console.error('Gemini API error:', response.status, data.error?.message);
-      return Response.json(
-        { error: 'Outreach+ could not respond right now. Please try again.' },
-        { status: 502 },
-      );
-    }
-
-    const reply = data.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text || '')
-      .join('')
-      .trim();
-
-    if (!reply) {
-      return Response.json(
-        { error: 'Outreach+ returned an empty response. Please try again.' },
-        { status: 502 },
-      );
-    }
-
+    const response = await ai.models.generateContent({
+      model: MODEL,
+      contents: messages.map((message) => ({ role: message.role === 'assistant' ? 'model' : 'user', parts: [{ text: message.content.trim() }] })),
+      config: { systemInstruction: SYSTEM_INSTRUCTION, temperature: 0.6, maxOutputTokens: 900 },
+    });
+    const reply = response.text?.trim();
+    if (!reply) return Response.json({ error: 'Outreach+ returned an empty response. Please retry your message.' }, { status: 502 });
     return Response.json({ message: reply });
   } catch (error) {
-    console.error('Chat request failed:', error);
-    return Response.json(
-      { error: 'Outreach+ could not connect to the AI service.' },
-      { status: 502 },
-    );
+    return errorResponse(error);
   }
 }
