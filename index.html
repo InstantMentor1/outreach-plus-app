@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Outreach+ is your WhatsApp-native content and growth manager for hospitality." />
+  <title>Outreach+ — Your growth manager lives on WhatsApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg-gold:#FDD667; --text-charcoal:#443535; --accent-green:#274020; --bg-white:#fff; --muted:#716061; --line:rgba(68,53,53,.15); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--text-charcoal); font-family:"DM Sans",sans-serif; background:var(--bg-gold); line-height:1.5; }
+    a { color:inherit; text-decoration:none; }
+    button,input { font:inherit; }
+    .container { width:min(1120px, calc(100% - 40px)); margin:auto; }
+    .eyebrow { margin:0 0 13px; color:var(--accent-green); font-weight:700; font-size:.76rem; letter-spacing:.11em; text-transform:uppercase; }
+    h1,h2,h3 { font-family:"Plus Jakarta Sans",sans-serif; line-height:1.08; letter-spacing:-.045em; margin:0; }
+    h2 { font-size:clamp(2rem,4vw,3.25rem); max-width:720px; }
+    .section { padding:100px 0; }
+    .section-copy { color:var(--muted); font-size:1.08rem; max-width:590px; margin:19px 0 0; }
+    .header { height:76px; position:sticky; top:0; z-index:10; background:rgba(253,214,103,.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(68,53,53,.08); }
+    .header-inner { height:100%; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .logo { width:183px; height:43px; overflow:hidden; position:relative; display:block; }
+    .logo img { position:absolute; width:307px; max-width:none; left:-62px; top:-68px; }
+    .nav { display:flex; gap:29px; align-items:center; font-weight:600; font-size:.92rem; }
+    .nav a:hover { color:var(--accent-green); }
+    .button { display:inline-flex; justify-content:center; align-items:center; border:0; cursor:pointer; border-radius:999px; background:var(--accent-green); color:white; padding:13px 20px; font-weight:700; transition:transform .2s,box-shadow .2s,background .2s; white-space:nowrap; }
+    .button:hover { transform:translateY(-2px); box-shadow:0 8px 18px rgba(39,64,32,.24); }
+    .nav-cta { padding:10px 17px; }
+    .hero { padding:70px 0 92px; overflow:hidden; }
+    .hero-grid { display:grid; grid-template-columns:1.04fr .96fr; align-items:center; gap:60px; }
+    .hero h1 { font-size:clamp(3rem,6vw,5.15rem); max-width:700px; }
+    .hero h1 em { color:var(--accent-green); font-style:normal; }
+    .hero-copy { font-size:1.12rem; max-width:585px; margin:24px 0 28px; color:#554343; }
+    .waitlist { display:flex; gap:9px; padding:6px; max-width:490px; background:white; border:1px solid rgba(68,53,53,.12); border-radius:999px; box-shadow:0 9px 25px rgba(81,58,15,.1); }
+    .waitlist input { min-width:0; flex:1; border:0; outline:0; padding:9px 13px; color:var(--text-charcoal); background:transparent; }
+    .form-message { min-height:23px; margin:10px 0 0 13px; color:var(--accent-green); font-weight:700; font-size:.9rem; }
+    .hero-note { margin:32px 0 0; font-size:.88rem; color:#5d4b39; }
+    .hero-note span { color:var(--accent-green); font-size:1.2rem; vertical-align:-1px; }
+    .phone-wrap { display:flex; align-items:center; justify-content:center; position:relative; min-height:510px; }
+    .orb { position:absolute; width:430px; height:430px; border-radius:50%; background:#fff0bd; opacity:.72; }
+    .phone { position:relative; width:278px; padding:10px; background:#352c2c; border:7px solid #352c2c; border-radius:38px; box-shadow:20px 25px 0 rgba(39,64,32,.16), 0 25px 55px rgba(78,59,14,.22); transform:rotate(4deg); }
+    .phone:before { content:""; position:absolute; width:100px; height:22px; left:50%; top:0; transform:translateX(-50%); border-radius:0 0 14px 14px; background:#352c2c; z-index:2; }
+    .screen { background:#ece5dc; border-radius:25px; overflow:hidden; min-height:510px; }
+    .chat-header { background:#075e54; color:#fff; padding:31px 14px 13px; display:flex; align-items:center; gap:9px; font-size:.77rem; font-weight:700; }
+    .avatar { display:grid; place-items:center; width:27px; height:27px; border-radius:50%; background:var(--bg-gold); color:var(--accent-green); font-weight:800; }
+    .chat { padding:17px 11px; display:grid; gap:13px; background:linear-gradient(135deg,#e6ddd1 25%,transparent 25%) 0 0/24px 24px; }
+    .bubble { width:max-content; max-width:88%; padding:9px 10px 6px; border-radius:8px; font-size:.73rem; box-shadow:0 1px 1px #00000012; }
+    .bubble small { display:block; text-align:right; color:#7e7e7e; font-size:.57rem; margin-top:2px; }
+    .sent { margin-left:auto; background:#d9fdd3; border-top-right-radius:0; }
+    .received { background:#fff; border-top-left-radius:0; }
+    .post-card { margin:1px 5px; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 5px 10px #00000012; }
+    .post-image { height:105px; padding:13px; background:linear-gradient(130deg,#b44e29,#e98b39 60%,#f4d36b); color:#fff8da; display:flex; align-items:end; font-family:"Plus Jakarta Sans"; font-size:1.05rem; font-weight:800; line-height:1; }
+    .post-meta { padding:7px 9px; font-size:.62rem; color:#776262; }
+    .post-meta b { display:block; color:var(--text-charcoal); margin-bottom:2px; }
+    .mockup-label { position:absolute; right:-30px; bottom:13px; z-index:2; padding:8px 12px; background:white; border-radius:99px; box-shadow:0 8px 17px #644e1670; color:var(--accent-green); font-size:.75rem; font-weight:700; transform:rotate(-4deg); }
+    .problem { background:white; }
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:17px; margin-top:48px; }
+    .card { padding:27px; border:1px solid #efe9e1; border-radius:18px; box-shadow:0 8px 22px rgba(68,53,53,.06); }
+    .icon { display:grid; place-items:center; width:43px; height:43px; background:var(--bg-gold); border-radius:13px; font-size:1.4rem; }
+    .card h3 { margin:20px 0 10px; font-size:1.18rem; letter-spacing:-.03em; }
+    .card p { margin:0; color:var(--muted); font-size:.95rem; }
+    .how { background:var(--bg-gold); }
+    .steps { display:grid; grid-template-columns:repeat(4,1fr); margin-top:52px; }
+    .step { padding:7px 24px 7px 0; position:relative; }
+    .step:not(:last-child):after { content:""; position:absolute; top:28px; right:0; height:1px; width:34px; background:var(--accent-green); opacity:.5; }
+    .step-number { color:var(--accent-green); font-family:"Plus Jakarta Sans"; font-size:.79rem; font-weight:800; }
+    .step-icon { margin:17px 0; display:grid; place-items:center; width:48px; height:48px; color:#fff; background:var(--accent-green); border-radius:50%; font-size:1.25rem; }
+    .step h3 { font-size:1.15rem; letter-spacing:-.03em; }
+    .step p { margin:9px 0 0; color:#634e41; font-size:.91rem; max-width:215px; }
+    .whatsapp { background:var(--accent-green); color:white; }
+    .whatsapp-grid { display:grid; grid-template-columns:1fr .85fr; align-items:center; gap:60px; }
+    .whatsapp .eyebrow { color:var(--bg-gold); }
+    .whatsapp h2 { color:white; }
+    .whatsapp .section-copy { color:#dce6d8; }
+    .whatsapp-points { display:grid; gap:15px; }
+    .whatsapp-points div { padding:18px 20px; border:1px solid rgba(255,255,255,.2); border-radius:14px; background:rgba(255,255,255,.07); font-weight:600; }
+    .whatsapp-points span { color:var(--bg-gold); margin-right:9px; }
+    .capabilities { background:white; }
+    .capability-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:45px; }
+    .capability { padding:24px; border-radius:17px; background:#fbfaf7; border:1px solid #eee8de; }
+    .capability .icon { background:var(--accent-green); color:var(--bg-gold); }
+    .capability h3 { margin:17px 0 8px; font-size:1.05rem; letter-spacing:-.03em; }
+    .capability p { margin:0; color:var(--muted); font-size:.91rem; }
+    .proof { padding:31px 0; background:#e9c65c; }
+    .proof-inner { display:flex; justify-content:space-between; align-items:center; gap:30px; }
+    .proof strong { font-family:"Plus Jakarta Sans"; font-size:1.18rem; letter-spacing:-.035em; }
+    .proof p { margin:4px 0 0; color:#675532; font-size:.9rem; }
+    .tbd { padding:7px 12px; border:1px solid rgba(39,64,32,.28); border-radius:99px; color:var(--accent-green); font-weight:800; font-size:.73rem; text-transform:uppercase; letter-spacing:.07em; }
+    .pricing { background:white; }
+    .pricing-head { display:flex; justify-content:space-between; align-items:end; gap:30px; }
+    .pricing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:44px; align-items:stretch; }
+    .price-card { padding:24px 20px; border:1px solid #e9e1d6; border-radius:18px; position:relative; display:flex; flex-direction:column; }
+    .price-card.popular { background:var(--accent-green); color:white; border-color:var(--accent-green); transform:translateY(-9px); box-shadow:0 15px 25px rgba(39,64,32,.18); }
+    .badge { position:absolute; top:-12px; left:20px; padding:5px 10px; border-radius:99px; color:var(--accent-green); background:var(--bg-gold); font-size:.67rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+    .price-card h3 { font-size:1.05rem; letter-spacing:-.025em; }
+    .price { margin:21px 0 3px; font-family:"Plus Jakarta Sans"; font-weight:800; letter-spacing:-.05em; font-size:1.72rem; }
+    .cycle { color:var(--muted); font-size:.8rem; min-height:38px; }
+    .popular .cycle { color:#dbe6d8; }
+    .features { list-style:none; margin:21px 0; padding:0; display:grid; gap:10px; font-size:.82rem; }
+    .features li:before { content:"✓"; color:var(--accent-green); font-weight:800; margin-right:7px; }
+    .popular .features li:before { color:var(--bg-gold); }
+    .price-card .button { margin-top:auto; padding:11px; background:var(--bg-gold); color:var(--text-charcoal); }
+    .price-card:not(.popular) .button { background:var(--accent-green); color:white; }
+    .faq { background:var(--bg-gold); }
+    .faq-grid { display:grid; grid-template-columns:.8fr 1.2fr; gap:70px; align-items:start; }
+    .faq-list { border-top:1px solid var(--line); }
+    details { border-bottom:1px solid var(--line); padding:19px 0; }
+    summary { list-style:none; cursor:pointer; font-family:"Plus Jakarta Sans"; font-weight:700; letter-spacing:-.02em; display:flex; justify-content:space-between; gap:20px; }
+    summary::-webkit-details-marker { display:none; }
+    summary:after { content:"+"; color:var(--accent-green); font-size:1.35rem; line-height:.8; }
+    details[open] summary:after { content:"−"; }
+    details p { margin:13px 32px 0 0; color:#624f43; font-size:.94rem; }
+    .final { padding:82px 0; background:var(--accent-green); color:#fff; text-align:center; }
+    .final h2 { margin:auto; max-width:760px; color:white; }
+    .final p { margin:18px auto 25px; max-width:520px; color:#dbe6d8; }
+    .final .waitlist { margin:auto; text-align:left; }
+    .final .button { color:var(--accent-green); background:var(--bg-gold); }
+    .final .form-message { color:var(--bg-gold); text-align:left; max-width:490px; margin-left:auto; margin-right:auto; }
+    footer { padding:35px 0; background:#201a1a; color:#faf3e4; }
+    .footer-inner { display:flex; align-items:center; justify-content:space-between; gap:25px; }
+    footer .logo { border-radius:5px; }
+    .footer-links { display:flex; gap:20px; font-size:.85rem; color:#d7cebd; }
+    .footer-meta { text-align:right; color:#bdb2a4; font-size:.78rem; }
+    .footer-meta a { color:var(--bg-gold); }
+    @media (max-width:800px) { .nav { display:none; } .hero-grid,.whatsapp-grid,.faq-grid { grid-template-columns:1fr; gap:42px; } .hero { padding-top:54px; } .phone-wrap { min-height:460px; } .cards { grid-template-columns:1fr; } .capability-grid { grid-template-columns:repeat(2,1fr); } .steps { grid-template-columns:repeat(2,1fr); gap:30px 20px; } .step:not(:last-child):after { display:none; } .pricing-grid { grid-template-columns:repeat(2,1fr); gap:24px 14px; } .price-card.popular { transform:none; } .pricing-head { display:block; } .proof-inner { display:block; } .tbd { display:inline-block; margin-top:14px; } }
+    @media (max-width:480px) { .container { width:min(100% - 30px,1120px); } .header { height:65px; } .logo { width:145px; height:35px; } .logo img { width:243px; left:-49px; top:-54px; } .nav-cta { padding:9px 13px; font-size:.8rem; } .hero { padding-bottom:65px; } .waitlist { border-radius:17px; flex-direction:column; padding:7px; } .waitlist input { width:100%; min-height:40px; } .waitlist .button { width:100%; } .phone { transform:rotate(2deg) scale(.91); } .phone-wrap { margin:-18px 0 -30px; } .orb { width:340px; height:340px; } .section { padding:68px 0; } .steps,.pricing-grid,.capability-grid { grid-template-columns:1fr; } .step { padding-right:0; } .footer-inner { flex-direction:column; align-items:flex-start; } .footer-meta { text-align:left; } .footer-links { flex-wrap:wrap; } }
+  </style>
+</head>
+<body>
+  <header class="header"><div class="container header-inner">
+    <a class="logo" href="#top" aria-label="Outreach+ home"><img src="outreach-logo-reference.png" alt="Outreach+" /></a>
+    <nav class="nav" aria-label="Primary navigation"><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></nav>
+    <a class="button nav-cta" href="#waitlist">Join Waitlist</a>
+  </div></header>
+  <main id="top">
+    <section class="hero"><div class="container hero-grid"><div>
+      <p class="eyebrow">Meet Outreach+</p><h1>Your social media manager, on <em>WhatsApp.</em></h1>
+      <p class="hero-copy">Send a voice note, a messy message or a photo. Outreach+ turns it into posters, reels and local visibility — then keeps the conversation going so your restaurant never goes quiet.</p>
+      <form class="waitlist" data-waitlist><input aria-label="Email address" type="email" required placeholder="Your work email" /><button class="button" type="submit">Join Waitlist</button></form><p class="form-message" aria-live="polite"></p>
+      <p class="hero-note"><span>●</span> Built for independent restaurants, cafés & boutique hotels.</p>
+    </div><div class="phone-wrap" aria-label="Illustration placeholder showing a WhatsApp chat becoming an Instagram post"><div class="orb"></div><div class="phone"><div class="screen"><div class="chat-header"><span class="avatar">O+</span><span>Outreach+ <small style="display:block;font-weight:400;opacity:.8">online</small></span></div><div class="chat"><div class="bubble sent">🎤 aaj chicken biryani special hai, ₹250<small>11:42 ✓✓</small></div><div class="bubble received">Perfect. Any offer with it, or just the dish?<small>11:42</small></div><div class="bubble sent">just the dish. make it for stories too<small>11:43 ✓✓</small></div><div class="post-card"><div class="post-image">Chicken biryani.<br>₹250 today.</div><div class="post-meta"><b>Your Wednesday comfort fix 🍛</b>Freshly layered, richly spiced and ready for lunch.</div></div><div class="bubble received">Post + story live. Google updated too ✨<small>11:47</small></div></div></div></div><div class="mockup-label">Voice note to visibility</div></div>
+    </div></section>
+    <section class="problem section"><div class="container"><p class="eyebrow">The daily juggle</p><h2>Running a restaurant is a full-time job. So is social media.</h2><div class="cards"><article class="card"><div class="icon">↻</div><h3>Posting slips through</h3><p>Between service, suppliers and staff, consistent content is the first thing to get pushed to tomorrow.</p></article><article class="card"><div class="icon">⌛</div><h3>Content takes too long</h3><p>Good photos, captions and scheduling shouldn’t cost you an evening after an already long shift.</p></article><article class="card"><div class="icon">↗</div><h3>Likes don’t fill tables</h3><p>You need to know which offers brought in covers and bookings — not just which post got a heart.</p></article></div></div></section>
+    <section id="how-it-works" class="how section"><div class="container"><p class="eyebrow">Simple by design</p><h2>One familiar conversation. A manager who gets ahead of the work.</h2><div class="steps"><article class="step"><span class="step-number">01</span><div class="step-icon">✦</div><h3>Send anything</h3><p>Type it, speak it or send a photo. Outreach+ understands your everyday WhatsApp shorthand.</p></article><article class="step"><span class="step-number">02</span><div class="step-icon">?</div><h3>Fill the gaps</h3><p>It asks the useful follow-up — like whether there’s an offer — then remembers your menu and voice.</p></article><article class="step"><span class="step-number">03</span><div class="step-icon">↗</div><h3>Approve & publish</h3><p>Approve posters, stories and reels in one tap. Social channels and Google stay in sync.</p></article><article class="step"><span class="step-number">04</span><div class="step-icon">⌁</div><h3>Stay a step ahead</h3><p>Helpful prompts, weekly wins and sharper recommendations arrive in the same chat thread.</p></article></div></div></section>
+    <section class="whatsapp section"><div class="container whatsapp-grid"><div><p class="eyebrow">Why WhatsApp</p><h2>Because your business already runs on WhatsApp.</h2><p class="section-copy">Outreach+ fits into the way you work today. No new app for you or your team to learn. No forgotten login. Just a fast conversation that gets your marketing moving.</p></div><div class="whatsapp-points"><div><span>✓</span>Voice notes understood, not ignored</div><div><span>✓</span>No app or dashboard to learn</div><div><span>✓</span>Weekly reporting in plain language</div></div></div></section>
+    <section class="capabilities section"><div class="container"><p class="eyebrow">More than posting</p><h2>Everything a thoughtful social manager would notice — without the agency chase.</h2><p class="section-copy">From a festive idea before Diwali to the review pattern worth fixing, Outreach+ turns everyday signals into simple next steps.</p><div class="capability-grid"><article class="capability"><div class="icon">▣</div><h3>Creative, in every format</h3><p>Phone-photo posters, text-to-creative ideas, stories and reel versions — ready when the dish is.</p></article><article class="capability"><div class="icon">◌</div><h3>Proactive seasonal prompts</h3><p>Get the nudge before Diwali, IPL season or Sunday brunch, not after the opportunity has passed.</p></article><article class="capability"><div class="icon">★</div><h3>Reviews made manageable</h3><p>Draft replies for approval and surface patterns such as recurring weekend service feedback.</p></article><article class="capability"><div class="icon">⌖</div><h3>Local visibility, maintained</h3><p>Keep your Google Business Profile current with offers, hours and photos alongside every campaign.</p></article><article class="capability"><div class="icon">↗</div><h3>Growth, not vanity metrics</h3><p>Clear WhatsApp recaps connect posts and offers to the footfall and bookings you care about.</p></article><article class="capability"><div class="icon">≋</div><h3>A memory for your menu</h3><p>It learns your dishes, prices and room types — then spots the good items that have gone quiet.</p></article></div></div></section>
+    <section class="proof"><div class="container proof-inner"><div><strong>Starting close to home.</strong><p>Built for HSR Layout, Bangalore restaurants and hotels.</p></div><span class="tbd">Pilot locations · TBD</span></div></section>
+    <section id="pricing" class="pricing section"><div class="container"><div class="pricing-head"><div><p class="eyebrow">Simple pricing</p><h2>Choose the rhythm that works for your business.</h2></div><p class="section-copy">All plans include the essentials. Join the waitlist now; payment starts only when we launch.</p></div><div class="pricing-grid">
+      <article class="price-card"><h3>Monthly</h3><div class="price">₹999<span style="font-size:.85rem;letter-spacing:0">/mo</span></div><p class="cycle">Billed monthly</p><ul class="features"><li>Daily content generation</li><li>WhatsApp approval</li><li>Instagram + Facebook posting</li><li>Google Business Profile sync</li><li>Weekly performance check-in</li></ul><a href="#waitlist" class="button">Join Waitlist</a></article>
+      <article class="price-card popular"><span class="badge">Most popular</span><h3>Quarterly</h3><div class="price">₹2,499</div><p class="cycle">Every 3 months (~₹833/mo)</p><ul class="features"><li>Daily content generation</li><li>WhatsApp approval</li><li>Instagram + Facebook posting</li><li>Google Business Profile sync</li><li>Weekly performance check-in</li></ul><a href="#waitlist" class="button">Join Waitlist</a></article>
+      <article class="price-card"><h3>Half-yearly</h3><div class="price">₹4,999</div><p class="cycle">Every 6 months (~₹833/mo)</p><ul class="features"><li>Daily content generation</li><li>WhatsApp approval</li><li>Instagram + Facebook posting</li><li>Google Business Profile sync</li><li>Weekly performance check-in</li></ul><a href="#waitlist" class="button">Join Waitlist</a></article>
+      <article class="price-card"><h3>Annual</h3><div class="price">₹8,999</div><p class="cycle">Every 12 months (~₹750/mo, best value)</p><ul class="features"><li>Daily content generation</li><li>WhatsApp approval</li><li>Instagram + Facebook posting</li><li>Google Business Profile sync</li><li>Weekly performance check-in</li></ul><a href="#waitlist" class="button">Join Waitlist</a></article>
+    </div></div></section>
+    <section id="faq" class="faq section"><div class="container faq-grid"><div><p class="eyebrow">Good questions</p><h2>Everything you need to know before joining.</h2></div><div class="faq-list"><details open><summary>Who is Outreach+ for?</summary><p>Independent restaurants, cafés and boutique hotels that want a consistent online presence — without hiring a full marketing team. It’s not designed for large chains with centralised teams.</p></details><details><summary>Do I need to install an app?</summary><p>No. Everything runs through WhatsApp, the tool you and your team already use every day.</p></details><details><summary>What languages does it support?</summary><p>Outreach+ launches in English. More languages are planned as we grow with our local hospitality community.</p></details><details><summary>When does it launch?</summary><p>Early waitlist access opens with our Bangalore pilot. Join now and we’ll let you know when Outreach+ is ready for your city.</p></details><details><summary>Is there a free trial?</summary><p>Early waitlist members invited to the pilot will receive a free pilot period. We want to make sure it earns its place in your day.</p></details></div></div></section>
+    <section id="waitlist" class="final"><div class="container"><h2>Be first in line when Outreach+ launches in your city.</h2><p>Join the early-access waitlist and get first word on our Bangalore pilot.</p><form class="waitlist" data-waitlist><input aria-label="Email address" type="email" required placeholder="Your work email" /><button class="button" type="submit">Join Waitlist</button></form><p class="form-message" aria-live="polite"></p></div></section>
+  </main>
+  <footer><div class="container footer-inner"><a class="logo" href="#top" aria-label="Outreach+ home"><img src="outreach-logo-reference.png" alt="Outreach+" /></a><div class="footer-links"><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div><div class="footer-meta"><a href="mailto:hello@outreachplus.in">hello@outreachplus.in</a><br>© 2026 Outreach+. All rights reserved.</div></div></footer>
+  <script>
+    // Replace this in-memory collection with an API, Mailchimp, or Google Sheets endpoint when ready.
+    const waitlistEmails = [];
+    document.querySelectorAll('[data-waitlist]').forEach(form => form.addEventListener('submit', event => {
+      event.preventDefault(); const input = form.querySelector('input'); const message = form.nextElementSibling; const email = input.value.trim().toLowerCase();
+      if (waitlistEmails.includes(email)) { message.textContent = "You're already on the waitlist — we'll be in touch soon."; return; }
+      waitlistEmails.push(email); message.textContent = "You're on the list! We'll be in touch before the pilot begins."; input.value = '';
+    }));
+  </script>
+</body>
+</html>

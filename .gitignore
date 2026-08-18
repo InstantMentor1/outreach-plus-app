@@ -1,0 +1,9 @@
+.vercel
+.next
+.next-stale
+node_modules
+dev-server.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
