@@ -1,0 +1,1 @@
+export default function Settings(){return <><p className="app-eyebrow">Settings</p><h1>Workspace settings</h1><section className="notice"><b>Account controls</b><p>Authentication is backed by Supabase. Plan changes and billing are not enabled in this version; contact Outreach+ for account support.</p></section></>}

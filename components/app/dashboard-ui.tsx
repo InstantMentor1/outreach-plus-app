@@ -1,0 +1,2 @@
+export function EmptyState({title,copy,action='Create Campaign'}:{title:string;copy:string;action?:string}){return <section className="empty-state"><span>✦</span><h2>{title}</h2><p>{copy}</p><a href="/dashboard/create-campaign">{action}</a></section>}
+export function DemoOpportunity({title,copy,signal}:{title:string;copy:string;signal:string}){return <article className="opportunity-card"><span>DEMO · BETA</span><h3>{title}</h3><p>{copy}</p><small>{signal}</small><a href="/dashboard/create-campaign">Create Campaign</a></article>}

@@ -1,0 +1,2 @@
+import Navbar from '@/components/navbar'; import { AuthForm } from '@/components/app/auth-form'; import '../app-shell.css';
+export default function LoginPage(){return <><Navbar/><main className="auth-page"><section><p className="app-eyebrow">Welcome back</p><h1>Take the next best marketing action.</h1><p>Log in to your Outreach+ campaign workspace.</p><AuthForm mode="login"/><p className="auth-switch">New to Outreach+? <a href="/register">Create an account</a></p></section></main></>}

@@ -1,0 +1,2 @@
+import Navbar from '@/components/navbar'; import { AuthForm } from '@/components/app/auth-form'; import '../app-shell.css';
+export default function RegisterPage(){return <><Navbar/><main className="auth-page"><section><p className="app-eyebrow">Founding access</p><h1>Start with one better campaign.</h1><p>Create your secure account, then build a short business profile before generating your first campaign.</p><AuthForm mode="register"/><p className="auth-switch">Already have an account? <a href="/login">Log in</a></p></section></main></>}

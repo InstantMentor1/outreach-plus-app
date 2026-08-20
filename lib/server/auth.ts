@@ -5,9 +5,10 @@ import { cookies } from 'next/headers';
 
 const ADMIN_COOKIE = 'outreach_admin';
 const CLIENT_COOKIE = 'outreach_client';
+const USER_COOKIE = 'outreach_user';
 const HOUR = 60 * 60;
 
-type Session = { role: 'admin' | 'client'; clientId?: string; exp: number };
+type Session = { role: 'admin' | 'client' | 'user'; clientId?: string; userId?: string; email?: string; exp: number };
 
 function secret() {
   const value = process.env.SESSION_SECRET;
@@ -39,10 +40,13 @@ const options = { httpOnly: true, sameSite: 'lax' as const, secure: process.env.
 
 export async function getAdminSession() { return verify((await cookies()).get(ADMIN_COOKIE)?.value)?.role === 'admin'; }
 export async function getClientSession() { const session = verify((await cookies()).get(CLIENT_COOKIE)?.value); return session?.role === 'client' && session.clientId ? session : null; }
+export async function getUserSession() { const session = verify((await cookies()).get(USER_COOKIE)?.value); return session?.role === 'user' && session.userId ? session : null; }
 export function adminCookie() { return { name: ADMIN_COOKIE, value: token({ role: 'admin', exp: Math.floor(Date.now() / 1000) + 8 * HOUR }), options: { ...options, maxAge: 8 * HOUR } }; }
 export function clientCookie(clientId: string) { return { name: CLIENT_COOKIE, value: token({ role: 'client', clientId, exp: Math.floor(Date.now() / 1000) + 30 * 24 * HOUR }), options: { ...options, maxAge: 30 * 24 * HOUR } }; }
+export function userCookie(userId: string, email?: string) { return { name: USER_COOKIE, value: token({ role: 'user', userId, email, exp: Math.floor(Date.now() / 1000) + 7 * 24 * HOUR }), options: { ...options, maxAge: 7 * 24 * HOUR } }; }
 export const clearAdminCookie = { name: ADMIN_COOKIE, value: '', options: { ...options, maxAge: 0 } };
 export const clearClientCookie = { name: CLIENT_COOKIE, value: '', options: { ...options, maxAge: 0 } };
+export const clearUserCookie = { name: USER_COOKIE, value: '', options: { ...options, maxAge: 0 } };
 
 export function validAdminPassword(password: unknown) {
   const expected = process.env.ADMIN_PASSWORD;
