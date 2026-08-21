@@ -1,0 +1,15 @@
+:root {
+  --blue-canvas: linear-gradient(135deg, #d5edff 0%, #f8fcff 48%, #cfe8fb 100%);
+}
+
+body {
+  background: var(--blue-canvas) fixed;
+}
+
+.trust-strip {
+  background: linear-gradient(90deg, #edf8ffdd, #d9eeffdd);
+}
+
+.public-page {
+  background: var(--blue-canvas);
+}
