@@ -27,16 +27,44 @@ function decodeHtml(value: string) {
   return value.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 }
 
+function attribute(tag: string, name: string) {
+  return new RegExp(`\\b${name}\\s*=\\s*(["'])([\\s\\S]*?)\\1`, 'i').exec(tag)?.[2]?.trim() || null;
+}
+
+function fontNames(html: string) {
+  const values = [...html.matchAll(/<link\b[^>]*>/gi)]
+    .map((match) => attribute(match[0], 'href'))
+    .filter((href): href is string => Boolean(href && /fonts\.googleapis\.com/i.test(href)));
+  return [...new Set(values.flatMap((href) => {
+    try {
+      return new URL(href, 'https://example.com').searchParams.getAll('family').map((family) => decodeURIComponent(family).split(':')[0].replace(/\+/g, ' ').trim());
+    } catch { return []; }
+  }).filter(Boolean))].slice(0, 8);
+}
+
 function readableText(html: string) {
-  const title = [...html.matchAll(/<title[^>]*>([\s\S]*?)<\/title>/gi)].map((match) => match[1]);
-  const metadata = [...html.matchAll(/<meta\b[^>]*(?:name|property)=["'][^"']+["'][^>]*content=["']([^"']+)["'][^>]*>/gi)].map((match) => match[1]);
-  const structuredData = [...html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
+  const title = decodeHtml(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] || '').replace(/\s+/g, ' ').trim();
+  const metadata = [...html.matchAll(/<meta\b[^>]*>/gi)].flatMap((match) => {
+    const tag = match[0];
+    const key = attribute(tag, 'name') || attribute(tag, 'property') || attribute(tag, 'itemprop');
+    const content = attribute(tag, 'content');
+    return key && content ? [{ key: key.toLowerCase(), content: decodeHtml(content) }] : [];
+  }).slice(0, 80);
+  const structuredData = [...html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].flatMap((match) => {
+    try { return [JSON.parse(match[1])]; } catch { return []; }
+  }).slice(0, 12);
   const bodyText = html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<[^>]+>/g, ' ');
 
-  return decodeHtml([...title, ...metadata, ...structuredData, bodyText].join(' ')).replace(/\s+/g, ' ').trim().slice(0, 24_000);
+  return JSON.stringify({
+    title,
+    metadata,
+    fonts: fontNames(html),
+    structured_data: structuredData,
+    visible_text: decodeHtml(bodyText).replace(/\s+/g, ' ').trim().slice(0, 18_000),
+  }).slice(0, 28_000);
 }
 
 export async function POST(request: NextRequest) {
