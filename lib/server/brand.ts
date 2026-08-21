@@ -22,7 +22,18 @@ const brandProperties = {
   business_summary: { type: ['string', 'null'] }, target_audience: { type: ['string', 'null'] }, brand_positioning: { type: ['string', 'null'] }, tone_of_voice: { type: ['string', 'null'] }, brand_values: { type: 'array', items: { type: 'string' } }, primary_colour: { type: ['string', 'null'] }, secondary_colours: { type: 'array', items: { type: 'string' } }, fonts: { type: 'array', items: { type: 'string' } }, visual_style: { type: 'array', items: { type: 'string' } }, logo_rules: { type: 'array', items: { type: 'string' } }, content_guidelines: { type: 'array', items: { type: 'string' } }, prohibited_usage: { type: 'array', items: { type: 'string' } }, additional_context: { type: 'array', items: { type: 'string' } }, extraction_confidence: { type: 'object', additionalProperties: { type: 'string' } },
 };
 const schema = { type: 'object', properties: brandProperties, required: Object.keys(brandProperties) };
-const websiteSchema = { type: 'object', properties: { business_name: { type: ['string', 'null'] }, business_type: { type: ['string', 'null'] }, location: { type: ['string', 'null'] }, ...brandProperties }, required: ['business_name', 'business_type', 'location', ...Object.keys(brandProperties)] };
+const websiteProperties = {
+  business_name: { type: ['string', 'null'] },
+  business_type: { type: ['string', 'null'] },
+  location: { type: ['string', 'null'] },
+  business_summary: { type: ['string', 'null'] },
+  target_audience: { type: ['string', 'null'] },
+  brand_positioning: { type: ['string', 'null'] },
+  tone_of_voice: { type: ['string', 'null'] },
+  primary_colour: { type: ['string', 'null'] },
+  visual_style: { type: 'array', items: { type: 'string' } },
+};
+const websiteSchema = { type: 'object', properties: websiteProperties, required: Object.keys(websiteProperties) };
 
 function aiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -37,7 +48,7 @@ export async function extractBrandProfile(pdf: Buffer) {
 }
 
 export async function extractWebsiteBrandDraft(website: string, pageText: string) {
-  const response = await aiClient().models.generateContent({ model: MODEL, contents: [{ role: 'user', parts: [{ text: `Create a conservative draft brand book from this public website. Website: ${website}\n\nWebsite text:\n${pageText}\n\nUse only explicit information in the text. Do not infer menu items, prices, offers, locations, audiences, brand colours, fonts or claims. Return null or [] when unknown. Treat this as a draft that requires business-owner approval.` }] }], config: { responseMimeType: 'application/json', responseJsonSchema: websiteSchema, maxOutputTokens: 1600 } });
+  const response = await aiClient().models.generateContent({ model: MODEL, contents: [{ role: 'user', parts: [{ text: `Create a compact, conservative draft brand book from this public website. Website: ${website}\n\nWebsite text:\n${pageText}\n\nUse only explicit information in the text. Do not infer menu items, prices, offers, locations, audiences, brand colours, fonts or claims. Return null or [] when unknown. Keep every written value concise. This is a draft that requires business-owner approval.` }] }], config: { responseMimeType: 'application/json', responseJsonSchema: websiteSchema, maxOutputTokens: 800 } });
   if (!response.text) throw new Error('Gemini returned no structured brand draft.');
   return JSON.parse(response.text) as WebsiteBrandDraft;
 }
