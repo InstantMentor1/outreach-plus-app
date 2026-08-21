@@ -8,6 +8,11 @@ function strings(value: unknown, limit = 12) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string').map((item) => item.trim().slice(0, 240)).filter(Boolean).slice(0, limit) : [];
 }
 
+function commaStrings(value: unknown, fallback: unknown, limit = 12) {
+  const entered = safeText(value, 1_200);
+  return entered ? entered.split(',').map((item) => item.trim().slice(0, 240)).filter(Boolean).slice(0, limit) : strings(fallback, limit);
+}
+
 function draftFrom(value: unknown) {
   if (typeof value !== 'string' || value.length > 16_000) return {} as Record<string, unknown>;
   try { const parsed = JSON.parse(value); return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {}; } catch { return {}; }
@@ -29,18 +34,18 @@ export async function POST(request: NextRequest) {
     if (error || !client) throw error ?? new Error('Client record was not returned.');
     const { error: profileError } = await db.from('brand_profiles').upsert({
       client_id: client.id,
-      business_summary: safeText(draft.business_summary, 1_000) || `${businessName} is a ${category} in ${location}.`,
+      business_summary: safeText(body.brandSummary, 1_000) || safeText(draft.business_summary, 1_000) || `${businessName} is a ${category} in ${location}.`,
       target_audience: audience,
-      brand_positioning: safeText(draft.brand_positioning, 600) || null,
+      brand_positioning: safeText(body.positioning, 600) || safeText(draft.brand_positioning, 600) || null,
       tone_of_voice: tone || safeText(draft.tone_of_voice, 200) || null,
-      brand_values: strings(draft.brand_values),
-      primary_colour: safeText(draft.primary_colour, 40) || null,
-      secondary_colours: strings(draft.secondary_colours, 8),
-      fonts: strings(draft.fonts, 8),
-      visual_style: strings(draft.visual_style),
+      brand_values: commaStrings(body.brandValues, draft.brand_values),
+      primary_colour: safeText(body.primaryColour, 40) || safeText(draft.primary_colour, 40) || null,
+      secondary_colours: commaStrings(body.secondaryColours, draft.secondary_colours, 8),
+      fonts: commaStrings(body.fonts, draft.fonts, 8),
+      visual_style: commaStrings(body.visualStyle, draft.visual_style),
       logo_rules: strings(draft.logo_rules),
-      content_guidelines: strings(draft.content_guidelines),
-      prohibited_usage: strings(draft.prohibited_usage),
+      content_guidelines: commaStrings(body.contentGuidelines, draft.content_guidelines),
+      prohibited_usage: commaStrings(body.prohibitedUsage, draft.prohibited_usage),
       additional_context: { marketing_goal: goal, website: website || null, instagram: instagram || null, google_business_link: google || null, website_signals: strings(draft.additional_context), source: website ? 'approved website draft' : 'manual onboarding' },
       extraction_confidence: draft.extraction_confidence && typeof draft.extraction_confidence === 'object' && !Array.isArray(draft.extraction_confidence) ? draft.extraction_confidence : {},
       reviewed: true,
