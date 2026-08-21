@@ -23,8 +23,20 @@ async function publicWebsite(value: string) {
   return url;
 }
 
+function decodeHtml(value: string) {
+  return value.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+}
+
 function readableText(html: string) {
-  return html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().slice(0, 24_000);
+  const title = [...html.matchAll(/<title[^>]*>([\s\S]*?)<\/title>/gi)].map((match) => match[1]);
+  const metadata = [...html.matchAll(/<meta\b[^>]*(?:name|property)=["'][^"']+["'][^>]*content=["']([^"']+)["'][^>]*>/gi)].map((match) => match[1]);
+  const structuredData = [...html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
+  const bodyText = html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
+
+  return decodeHtml([...title, ...metadata, ...structuredData, bodyText].join(' ')).replace(/\s+/g, ' ').trim().slice(0, 24_000);
 }
 
 export async function POST(request: NextRequest) {
