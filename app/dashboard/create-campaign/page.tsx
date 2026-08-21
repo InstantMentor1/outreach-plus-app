@@ -1,1 +1,11 @@
-const choices=['Increase weekday sales','Promote an offer','Launch a new product','Create a festival campaign','Bring back previous customers','Promote an event','Create this week’s content','Start from my own idea']; export default function CreateCampaign(){return <><p className="app-eyebrow">Campaign Studio</p><h1>Start with a business objective.</h1><p className="dash-lede">Campaign generation needs an approved business profile. Choose a starting action now; generation is enabled after onboarding.</p><section className="choice-grid">{choices.map(choice=><button key={choice} disabled title="Complete onboarding to generate a campaign">{choice}<small>Available after onboarding</small></button>)}</section><section className="notice"><b>What a generated campaign will include</b><p>Strategic reasoning, offer, audience, poster brief, captions, WhatsApp message, suggested duration, budget guidance and a clear approval status.</p></section></>}
+import { CampaignStudio } from '@/components/app/campaign-studio';
+import { getUserSession } from '@/lib/server/auth';
+import { supabaseAdmin } from '@/lib/server/supabase';
+
+export default async function CreateCampaign() {
+  const session = await getUserSession();
+  const db = supabaseAdmin();
+  const { data: client } = session?.userId ? await db.from('clients').select('id').eq('owner_user_id', session.userId).maybeSingle() : { data: null };
+  const { data: profile } = client ? await db.from('brand_profiles').select('reviewed').eq('client_id', client.id).maybeSingle() : { data: null };
+  return <><p className="app-eyebrow">Campaign Studio</p><h1>Start with a business objective.</h1><CampaignStudio ready={Boolean(profile?.reviewed)} /></>;
+}
