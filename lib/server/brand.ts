@@ -41,6 +41,29 @@ function aiClient() {
   return new GoogleGenAI({ apiKey });
 }
 
+function publicWebsiteFallback(website: string, pageText: string): WebsiteBrandDraft {
+  const find = (pattern: RegExp) => pattern.exec(pageText)?.[1]?.trim() || null;
+  const businessName = find(/"name"\s*:\s*"([^"\\]+)"/) || find(/^(.*?)\s*[|\-]/);
+  const cuisine = find(/"servesCuisine"\s*:\s*"([^"\\]+)"/);
+  const locality = find(/"addressLocality"\s*:\s*"([^"\\]+)"/);
+  const region = find(/"addressRegion"\s*:\s*"([^"\\]+)"/);
+  const summary = find(/(?:description|og:description)[^]{0,20}?"([^"\\]{30,500})"/) || null;
+
+  return {
+    business_name: businessName,
+    business_type: cuisine ? `${cuisine} restaurant` : null,
+    location: [locality, region].filter(Boolean).join(', ') || null,
+    business_summary: summary,
+    target_audience: null,
+    brand_positioning: null,
+    tone_of_voice: null,
+    primary_colour: null,
+    visual_style: [],
+    additional_context: [`Verified public website: ${website}`],
+    extraction_confidence: { source: 'Public website metadata and structured business data' },
+  };
+}
+
 export async function extractBrandProfile(pdf: Buffer) {
   const response = await aiClient().models.generateContent({ model: MODEL, contents: [{ role: 'user', parts: [{ inlineData: { mimeType: 'application/pdf', data: pdf.toString('base64') } }, { text: 'Extract a conservative draft Brand Brain from this Pomelli brand-book PDF. Use only document-supported information. For unknown text fields return null; for unknown lists return []; use extraction_confidence to note confidence and source basis. Never infer missing colours, fonts, audience, rules or claims.' }] }], config: { responseMimeType: 'application/json', responseJsonSchema: schema } });
   if (!response.text) throw new Error('Gemini returned no structured extraction.');
@@ -50,5 +73,10 @@ export async function extractBrandProfile(pdf: Buffer) {
 export async function extractWebsiteBrandDraft(website: string, pageText: string) {
   const response = await aiClient().models.generateContent({ model: MODEL, contents: [{ role: 'user', parts: [{ text: `Create a compact, conservative draft brand book from this public website. Website: ${website}\n\nWebsite text:\n${pageText}\n\nUse only explicit information in the text. Do not infer menu items, prices, offers, locations, audiences, brand colours, fonts or claims. Return null or [] when unknown. Keep every written value concise. This is a draft that requires business-owner approval.` }] }], config: { responseMimeType: 'application/json', responseJsonSchema: websiteSchema, maxOutputTokens: 800 } });
   if (!response.text) throw new Error('Gemini returned no structured brand draft.');
-  return JSON.parse(response.text) as WebsiteBrandDraft;
+  try {
+    return JSON.parse(response.text) as WebsiteBrandDraft;
+  } catch {
+    console.warn('[brand] Gemini returned malformed website-draft JSON; using verified website details.');
+    return publicWebsiteFallback(website, pageText);
+  }
 }
