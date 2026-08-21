@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
   let body: Record<string, unknown> = {};
   try { body = await request.json(); } catch {}
   const objective = safeText(body.objective, 240);
+  const customerAction = safeText(body.customerAction, 100);
   if (!objective) return NextResponse.json({ error: 'Choose a campaign objective first.' }, { status: 400 });
   try {
     const db = supabaseAdmin();
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!profile?.reviewed) return NextResponse.json({ error: 'Approve your Brand Profile before creating campaigns.' }, { status: 409 });
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: 'Outreach+ AI is not configured yet.' }, { status: 503 });
-    const result = await new GoogleGenAI({ apiKey }).models.generateContent({ model: MODEL, contents: [{ role: 'user', parts: [{ text: `Create one concise, approval-ready hospitality campaign draft for this objective: ${objective}.\n\nBusiness: ${JSON.stringify(client)}\nApproved brand profile: ${JSON.stringify(profile)}\n\nUse only the supplied brand facts. Do not invent menu items, prices, discounts, dates, locations or offer conditions. If a missing fact is essential, clearly label it as an owner decision. Include: campaign idea, audience, suggested offer framework, 2 caption options, 8 relevant hashtags, poster brief, and next approval question. Use Indian English.` }] }], config: { maxOutputTokens: 1_200 } });
+    const result = await new GoogleGenAI({ apiKey }).models.generateContent({ model: MODEL, contents: [{ role: 'user', parts: [{ text: `Create one concise, approval-ready campaign draft for this objective: ${objective}.\nCustomer action to plan for: ${customerAction || 'Owner decision required'}.\n\nBusiness: ${JSON.stringify(client)}\nApproved brand profile: ${JSON.stringify(profile)}\n\nAdapt the campaign to the supplied business type. Use only the supplied brand facts. Do not invent menu items, prices, discounts, dates, locations or offer conditions. If a missing fact is essential, clearly label it as an owner decision. Include: campaign idea, audience, suggested offer framework, 2 caption options, 8 relevant hashtags, poster brief, customer-action plan, and next approval question. Smart QR, publishing and tracking are not active tools: never claim they are live. Use Indian English.` }] }], config: { maxOutputTokens: 1_200 } });
     const draft = result.text?.trim();
     if (!draft) return NextResponse.json({ error: 'Outreach+ returned an empty campaign draft. Please retry.' }, { status: 502 });
     return NextResponse.json({ draft });
